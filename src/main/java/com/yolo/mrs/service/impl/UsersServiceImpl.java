@@ -8,11 +8,9 @@ import com.yolo.mrs.model.DTO.LoginFormDTO;
 import com.yolo.mrs.model.PO.Users;
 import com.yolo.mrs.mapper.UsersMapper;
 import com.yolo.mrs.model.Result;
-import com.yolo.mrs.model.VO.UsersVO;
 import com.yolo.mrs.service.IUsersService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +19,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static com.yolo.mrs.utils.redisConstant.USER_LOGIN_KEY;
-import static com.yolo.mrs.utils.redisConstant.USER_LOGIN_TTL;
+import static com.yolo.mrs.utils.RedisConstant.USER_LOGIN_KEY;
+import static com.yolo.mrs.utils.RedisConstant.USER_LOGIN_TTL;
 
 /**
  * <p>
