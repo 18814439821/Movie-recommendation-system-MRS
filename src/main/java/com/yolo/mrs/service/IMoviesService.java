@@ -2,6 +2,7 @@ package com.yolo.mrs.service;
 
 import com.yolo.mrs.model.PO.Movies;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yolo.mrs.model.Result;
 
 /**
  * <p>
@@ -13,4 +14,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IMoviesService extends IService<Movies> {
 
+    Result loadIndexList();
+
+    Result carousel();
 }

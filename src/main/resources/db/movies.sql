@@ -4,5 +4,6 @@ create table movies (
     stars VARCHAR(10) comment '评分，10.0满分，新增可以没有评分' default '0.0',
     cover VARCHAR(255) NOT NULL comment '电影封面',
     witticism VARCHAR(255) comment '电影名言，妙言',
-    release_date DATE comment '电影上映日期'
+    release_date DATE comment '电影上映日期',
+    carousel INT comment '是否轮播' default 0
 )

@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+!/src/main/java/com/yolo/mrs/utils/MovieData.java
+!/src/main/resources/static/pic
