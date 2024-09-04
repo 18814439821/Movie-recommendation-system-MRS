@@ -17,4 +17,6 @@ public interface IMoviesService extends IService<Movies> {
     Result loadIndexList();
 
     Result carousel();
+
+    Result movieDetail(int id);
 }

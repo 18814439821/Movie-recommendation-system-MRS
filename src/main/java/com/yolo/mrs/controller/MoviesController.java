@@ -62,4 +62,10 @@ public class MoviesController {
         return moviesService.carousel();
     }
 
+    @GetMapping("movieDetail/{id}")
+    public Result movieDetail(@PathVariable int id){
+        return moviesService.movieDetail(id);
+    }
+
+
 }

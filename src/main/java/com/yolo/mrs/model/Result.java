@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -14,7 +15,6 @@ public class Result {
     private String errorMsg;
     private Object data;
     private Long total;
-
     public static Result ok(){
         return new Result(true, null, null, null);
     }

@@ -1,11 +1,9 @@
 package com.yolo.mrs.service;
 
-import com.yolo.mrs.model.DTO.LoginFormDTO;
+import com.yolo.mrs.model.DTO.LoginForm;
 import com.yolo.mrs.model.PO.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yolo.mrs.model.Result;
-import jakarta.servlet.http.HttpSession;
-import org.apache.coyote.BadRequestException;
 
 /**
  * <p>
@@ -17,5 +15,7 @@ import org.apache.coyote.BadRequestException;
  */
 public interface IUsersService extends IService<Users> {
 
-    Result login(LoginFormDTO loginFormDTO);
+    Result login(LoginForm loginForm);
+
+    Result getCode();
 }

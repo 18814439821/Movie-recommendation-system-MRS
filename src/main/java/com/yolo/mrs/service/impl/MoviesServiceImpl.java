@@ -53,4 +53,10 @@ public class MoviesServiceImpl extends ServiceImpl<MoviesMapper, Movies> impleme
         return Result.ok(carousels);
     }
 
+    @Override
+    public Result movieDetail(int id) {
+        Movies movieInfo = getById(id);
+        return Result.ok(BeanUtil.copyProperties(movieInfo, MoviesVO.class));
+    }
+
 }

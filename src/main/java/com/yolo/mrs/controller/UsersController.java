@@ -1,11 +1,10 @@
 package com.yolo.mrs.controller;
 
-import com.yolo.mrs.model.DTO.LoginFormDTO;
+import com.yolo.mrs.model.DTO.LoginForm;
 import com.yolo.mrs.model.Result;
 import com.yolo.mrs.service.IUsersService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +26,13 @@ public class UsersController {
 
     private final IUsersService usersService;
 
-    @Operation(summary = "登录", description = "传入登录账号/手机号，密码")
     @PostMapping("login")
-    public Result login(@RequestBody @Validated LoginFormDTO loginFormDTO){
-        return usersService.login(loginFormDTO);
+    public Result login(@RequestBody @Validated LoginForm loginForm){
+        return usersService.login(loginForm);
+    }
+
+    @GetMapping("getCode")
+    public Result getCode(){
+        return usersService.getCode();
     }
 }

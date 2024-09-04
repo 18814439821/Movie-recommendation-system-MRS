@@ -1,8 +1,11 @@
 package com.yolo.mrs.config;
 
+import com.yolo.mrs.interceptor.LoginInterceptor;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 /**
@@ -12,7 +15,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
  **/
 @Configuration
 @Slf4j
-public class WebMvcConfig extends WebMvcConfigurationSupport {
+public abstract class WebMvcConfig extends WebMvcConfigurationSupport {
+
+    @Resource
+    LoginInterceptor loginInterceptor;
+
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         log.info("开启静态资源映射...");
@@ -34,4 +41,6 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                 .allowedHeaders("*")
                 .exposedHeaders("*");
     }
+
+    public abstract void addInterceptions(InterceptorRegistry registry);
 }
