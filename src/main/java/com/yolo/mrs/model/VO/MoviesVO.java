@@ -39,4 +39,7 @@ public class MoviesVO implements Serializable {
 
     @Schema(description = "电影上映日期")
     private LocalDate releaseDate;
+
+    @Schema(description = "电影类型")
+    private String genre;
 }

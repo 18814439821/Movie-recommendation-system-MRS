@@ -1,7 +1,5 @@
 package com.yolo.mrs.config;
 
-import com.yolo.mrs.interceptor.LoginInterceptor;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -17,8 +15,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 @Slf4j
 public abstract class WebMvcConfig extends WebMvcConfigurationSupport {
 
-    @Resource
-    LoginInterceptor loginInterceptor;
 
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -37,10 +33,8 @@ public abstract class WebMvcConfig extends WebMvcConfigurationSupport {
                 .allowCredentials(true)
                 //放行哪些原始域
                 .allowedOrigins("http://localhost:8080")
-                .allowedMethods(new String[]{"GET", "POST", "PUT", "DELETE"})
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
                 .exposedHeaders("*");
     }
-
-    public abstract void addInterceptions(InterceptorRegistry registry);
 }

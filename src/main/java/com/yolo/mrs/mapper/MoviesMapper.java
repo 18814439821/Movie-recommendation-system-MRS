@@ -22,4 +22,7 @@ import java.util.List;
 public interface MoviesMapper extends BaseMapper<Movies> {
     @Select("SELECT movie_id FROM movies WHERE carousel = 1")
     List<Carousel> selectForCarousel();
+
+    @Select("select movies.movie_id from movies where movie_name = #{movieName}")
+    Integer selectIdByMovieName(String movieName);
 }

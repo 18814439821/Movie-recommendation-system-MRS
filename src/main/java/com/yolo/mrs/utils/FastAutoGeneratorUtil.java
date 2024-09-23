@@ -22,8 +22,8 @@ public class FastAutoGeneratorUtil {
 
     public static void aaa() {
         String url = "jdbc:mysql://localhost:3306/mrs?serverTimezone=UTC&useUnicode=ture&characterEncoding=utf-8";
-        String pkgPath = System.getProperty("user.dir") + "/src/main/java";
-        String pkgXml = System.getProperty("user.dir") + "/src/main/resources/mapper";
+        String pkgPath = System.getProperty("user.dir") + "/MRS/src/main/java";
+        String pkgXml = System.getProperty("user.dir") + "/MRS/src/main/resources/mapper";
         FastAutoGenerator.create(url, "root", "123456")
                 // 全局配置
                 .globalConfig((scanner, builder) -> builder.outputDir(pkgPath).author(scanner.apply("请输入作者名称？"))

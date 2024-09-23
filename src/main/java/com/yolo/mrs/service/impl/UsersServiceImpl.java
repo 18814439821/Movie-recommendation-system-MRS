@@ -4,11 +4,14 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.yolo.mrs.model.DTO.LoginForm;
 import com.yolo.mrs.model.DTO.UsersDTO;
 import com.yolo.mrs.model.PO.Users;
 import com.yolo.mrs.mapper.UsersMapper;
 import com.yolo.mrs.model.Result;
+import com.yolo.mrs.model.VO.UsersVO;
 import com.yolo.mrs.service.IUsersService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yolo.mrs.utils.CaptchaGenerator;
@@ -16,10 +19,7 @@ import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.yolo.mrs.utils.Constant.*;
@@ -63,7 +63,9 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 String token = UUID.randomUUID().toString();
                 //把用户信息存入redis
                 user2redis(user, token);
-                return Result.ok(token);
+                UsersVO usersVO = BeanUtil.copyProperties(user, UsersVO.class);
+                usersVO.setToken(token);
+                return Result.ok(usersVO);
             }
         }
         //用户名为空或用户名错误
@@ -77,7 +79,9 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 String token = UUID.randomUUID().toString();
                 //把用户信息存入redis
                 user2redis(users, token);
-                return Result.ok(token);
+                UsersVO usersVO = BeanUtil.copyProperties(users, UsersVO.class);
+                usersVO.setToken(token);
+                return Result.ok(usersVO);
             }
         }
         //用户名手机号都无法查询到用户，说明用户未注册，我们帮用户自动注册
@@ -122,6 +126,28 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         responseData.put("captchaId", id);
         responseData.put("captchaImage", strings[0]);
         return Result.ok(responseData);
+    }
+
+    @Override
+    public int check(String token) {
+        String token1 = JSONUtil.toBean(token, Map.class).get("token").toString();
+        Boolean flag = stringRedisTemplate.hasKey(USER_LOGIN_KEY + token1);
+        System.out.println("flag = " + flag);
+        if (Boolean.TRUE.equals(flag)){
+            return 1;
+        }
+        return 0;
+    }
+
+    @Override
+    public int logout(String token) {
+        String token1 = JSONUtil.toBean(token, Map.class).get("token").toString();
+        Boolean delete = stringRedisTemplate.delete(USER_LOGIN_KEY + token1);
+        System.out.println("delete = " + delete);
+        if (Boolean.TRUE.equals(delete)){
+            return 1;
+        }
+        return 0;
     }
 
     private void user2redis(Users user, String token) {

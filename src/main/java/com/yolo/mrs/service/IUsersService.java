@@ -18,4 +18,8 @@ public interface IUsersService extends IService<Users> {
     Result login(LoginForm loginForm);
 
     Result getCode();
+
+    int check(String token);
+
+    int logout(String token);
 }

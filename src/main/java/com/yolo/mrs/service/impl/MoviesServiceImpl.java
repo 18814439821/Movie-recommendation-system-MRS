@@ -1,22 +1,42 @@
 package com.yolo.mrs.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.yolo.mrs.model.DTO.ConditionForm;
 import com.yolo.mrs.model.PO.Carousel;
 import com.yolo.mrs.model.PO.Movies;
 import com.yolo.mrs.mapper.MoviesMapper;
+import com.yolo.mrs.model.PO.MoviesDoc;
 import com.yolo.mrs.model.Result;
 import com.yolo.mrs.model.VO.MoviesVO;
 import com.yolo.mrs.service.IMoviesService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.Criteria;
+import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import org.springframework.data.elasticsearch.core.query.CriteriaQueryBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.yolo.mrs.utils.Constant.INDEX_LIST_COUNT;
@@ -35,7 +55,11 @@ public class MoviesServiceImpl extends ServiceImpl<MoviesMapper, Movies> impleme
 
     @Resource
     MoviesMapper moviesMapper;
+    @Resource
+    ElasticsearchTemplate elasticsearchTemplate;
 
+
+    /*主页展示列表*/
     @Override
     public Result loadIndexList() {
         IPage<Movies> page = new Page<>(INDEX_LIST_NUM, INDEX_LIST_COUNT);
@@ -47,16 +71,65 @@ public class MoviesServiceImpl extends ServiceImpl<MoviesMapper, Movies> impleme
         return Result.ok(moviesVOList,list.getTotal());
     }
 
+    /*主页轮播列表*/
     @Override
     public Result carousel() {
+        //首页轮播电影
         List<Carousel> carousels = moviesMapper.selectForCarousel();
         return Result.ok(carousels);
     }
 
+    /*电影详情*/
     @Override
     public Result movieDetail(int id) {
-        Movies movieInfo = getById(id);
-        return Result.ok(BeanUtil.copyProperties(movieInfo, MoviesVO.class));
+        Criteria criteria = new Criteria("movieId").is(id);
+        CriteriaQuery query = new CriteriaQuery(criteria);
+        SearchHit<MoviesDoc> moviesDocSearchHit = elasticsearchTemplate.searchOne(query, MoviesDoc.class);
+        if (moviesDocSearchHit != null){
+            MoviesVO moviesVO = BeanUtil.copyProperties(moviesDocSearchHit.getContent(), MoviesVO.class);
+            return Result.ok(moviesVO);
+        }
+        return Result.fail("查询失败，请刷新页面或联系管理员！");
+    }
+
+    /*根据条件搜索*/
+    @Override
+    public Result selectByCondition(ConditionForm conditionForm) {
+        System.out.println("conditionForm = " + conditionForm);
+        //准备es查询语句
+        Criteria criteria = new Criteria();
+        //处理前端传参
+        //判断是否有类别查询条件
+        if (!conditionForm.getGenre().isEmpty()){
+            criteria.and(new Criteria("genre").matches(conditionForm.getGenre()));
+        }
+        //判断是否有查询电影名称，如果有则添加查询条件
+        if (!StrUtil.isEmpty(conditionForm.getSelectStr())){
+            System.out.println("selectStr = " + conditionForm.getSelectStr());
+            criteria.and(new Criteria("movieName").matches(conditionForm.getSelectStr()));
+        }
+        //判断是否有地区筛选条件
+        //判断是否有上映时间筛选条件
+        if(conditionForm.getReleaseDate() != null){
+            //获取的日期为一年的第一天
+            LocalDate startDate = conditionForm.getReleaseDate();
+            //加一年之后设置为范围的最后一天
+            LocalDate endDate = startDate.plusYears(1);
+            criteria.and(new Criteria("releaseDate").greaterThanEqual(startDate).lessThan(endDate));
+        }
+        //判断是否有排序条件
+        //判断是否有排序方式
+        System.out.println("criteria = " + criteria);
+        CriteriaQuery query = new CriteriaQuery(criteria);
+        SearchHits<MoviesDoc> searchHits = elasticsearchTemplate.search(query, MoviesDoc.class);
+        System.out.println("searchHits = " + searchHits);
+        ArrayList<MoviesVO> movieList = new ArrayList<>();
+        for (SearchHit<MoviesDoc> searchHit : searchHits) {
+            MoviesVO moviesVO = BeanUtil.copyProperties(searchHit.getContent(), MoviesVO.class);
+            movieList.add(moviesVO);
+        }
+
+        return Result.ok(movieList, (long) movieList.size());
     }
 
 }

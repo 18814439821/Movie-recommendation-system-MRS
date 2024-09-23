@@ -28,7 +28,7 @@ public class MovieMid implements Serializable {
     private Integer id;
 
     @Schema(description = "类别")
-    private String gener;
+    private String genre;
 
     @Schema(description = "电影名")
     private String name;

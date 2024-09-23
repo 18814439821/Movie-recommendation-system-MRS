@@ -1,5 +1,6 @@
 package com.yolo.mrs.service;
 
+import com.yolo.mrs.model.DTO.ConditionForm;
 import com.yolo.mrs.model.PO.Movies;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yolo.mrs.model.Result;
@@ -19,4 +20,6 @@ public interface IMoviesService extends IService<Movies> {
     Result carousel();
 
     Result movieDetail(int id);
+
+    Result selectByCondition(ConditionForm conditionForm);
 }

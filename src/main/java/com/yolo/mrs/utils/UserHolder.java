@@ -1,16 +1,17 @@
 package com.yolo.mrs.utils;
 
 import com.yolo.mrs.model.DTO.UsersDTO;
+import com.yolo.mrs.model.VO.UsersVO;
 
 public class UserHolder {
 
-    private static final ThreadLocal<UsersDTO> tl = new ThreadLocal<>();
+    private static final ThreadLocal<UsersVO> tl = new ThreadLocal<>();
 
-    public static void setUser(UsersDTO usersDTO){
-        tl = usersDTO;
+    public static void setUser(UsersVO usersVO){
+        tl.set(usersVO);
     }
 
-    public static UsersDTO getUser(){
+    public static UsersVO getUser(){
         return tl.get();
     }
 

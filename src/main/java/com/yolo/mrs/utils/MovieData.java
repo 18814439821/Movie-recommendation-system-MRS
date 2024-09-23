@@ -94,7 +94,7 @@ public class MovieData {
                     if (!movieGenre.isEmpty()) {
                         //如果类别串不为空，就把他写入MovieMidList
                         MovieMid movieMid = new MovieMid();
-                        movieMid.setGener(movieGenre);
+                        movieMid.setGenre(movieGenre);
                         movieMid.setName(movieName);
                         movieMidList.add(movieMid);
                     }

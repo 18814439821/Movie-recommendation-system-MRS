@@ -2,15 +2,20 @@ package com.yolo.mrs.interceptor;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.yolo.mrs.model.DTO.UsersDTO;
+import com.yolo.mrs.model.VO.UsersVO;
 import com.yolo.mrs.utils.UserHolder;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+
+import java.util.Map;
 
 import static com.yolo.mrs.utils.RedisConstant.USER_LOGIN_KEY;
 
+@Component
 public class LoginInterceptor implements HandlerInterceptor {
 
     @Resource
@@ -18,20 +23,17 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        //获取当前登录用户
-        UsersDTO user = UserHolder.getUser();
-        Object token = request.getSession().getAttribute("authorization");
+
+        Object token = request.getHeader("Authorization");
         //尝试获取redis中是否存储当前对象
-        UsersDTO usersDTO = (UsersDTO) stringRedisTemplate.opsForHash().entries(USER_LOGIN_KEY + token);
-        if (BeanUtil.isEmpty(usersDTO)) {
+        Map<Object, Object> entries = stringRedisTemplate.opsForHash().entries(USER_LOGIN_KEY + token);
+        UsersVO usersVO = BeanUtil.fillBeanWithMap(entries, new UsersVO(), false);
+        if (BeanUtil.isEmpty(usersVO)) {
             //查无此用户
             response.sendError(401,"用户未登录");
             return false;
-        }else if (user != usersDTO){
-            //非当前登录用户
-            return false;
         }
-        return !BeanUtil.isEmpty(user);
+        return true;
     }
 
     @Override
