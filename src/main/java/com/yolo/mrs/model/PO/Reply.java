@@ -16,7 +16,7 @@ import lombok.Setter;
  * </p>
  *
  * @author yolo
- * @since 2024-09-23
+ * @since 2024-09-25
  */
 @Getter
 @Setter
@@ -29,14 +29,17 @@ public class Reply implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
+    @Schema(description = "回复信息id")
+    private String replyId;
+
     @Schema(description = "父评论id")
     private String commentId;
 
     @Schema(description = "评论者id")
-    private String aUser;
+    private String aUserId;
 
     @Schema(description = "被评论者id")
-    private String bUser;
+    private String bUserId;
 
     @Schema(description = "评论的时间")
     @TableField(fill = FieldFill.INSERT)

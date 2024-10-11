@@ -1,7 +1,9 @@
 package com.yolo.mrs.service;
 
+import com.yolo.mrs.model.DTO.CommentForm;
 import com.yolo.mrs.model.PO.Comment;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yolo.mrs.model.Result;
 
 /**
  * <p>
@@ -13,4 +15,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ICommentService extends IService<Comment> {
 
+    Result addComment(CommentForm commentForm);
+
+    Result getBasicComment(String movieId);
 }

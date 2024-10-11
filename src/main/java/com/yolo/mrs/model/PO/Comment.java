@@ -16,7 +16,7 @@ import lombok.Setter;
  * </p>
  *
  * @author yolo
- * @since 2024-09-23
+ * @since 2024-09-25
  */
 @Getter
 @Setter
@@ -28,6 +28,9 @@ public class Comment implements Serializable {
     @Schema(description = "主键")
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
+
+    @Schema(description = "评论信息id")
+    private String commentId;
 
     @Schema(description = "用户id")
     private String userId;

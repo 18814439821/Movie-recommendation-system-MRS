@@ -1,6 +1,9 @@
 package com.yolo.mrs.service;
 
 import com.yolo.mrs.model.DTO.LoginForm;
+import com.yolo.mrs.model.DTO.PwdFormDTO;
+import com.yolo.mrs.model.DTO.UserInfoDTO;
+import com.yolo.mrs.model.DTO.UsersDTO;
 import com.yolo.mrs.model.PO.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yolo.mrs.model.Result;
@@ -22,4 +25,12 @@ public interface IUsersService extends IService<Users> {
     int check(String token);
 
     int logout(String token);
+
+    Result userCheck(Users user);
+
+    Result updateUserInfo(UserInfoDTO user);
+
+    Result getUserPhoto(String photoSrc);
+
+    Result updatePwd(PwdFormDTO pwdForm);
 }

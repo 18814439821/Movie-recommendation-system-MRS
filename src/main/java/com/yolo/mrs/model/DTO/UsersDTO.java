@@ -34,4 +34,5 @@ public class UsersDTO implements Serializable {
 
     private String photo;
 
+    private Integer userId;
 }

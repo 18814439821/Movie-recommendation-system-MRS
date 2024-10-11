@@ -41,7 +41,8 @@ public class FastAutoGeneratorUtil {
                         .controllerBuilder().enableRestStyle().enableHyphenStyle()
                         .entityBuilder().enableLombok().addTableFills(
                                 new Column("create_time", FieldFill.INSERT)
-                        ).build())
+                                //enableFileOverride开启实体类覆写
+                        ).enableFileOverride().build())
                 .execute();
     }
 
