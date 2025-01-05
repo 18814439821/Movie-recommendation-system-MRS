@@ -14,11 +14,11 @@ public class Constant {
 
     //评论模式
     //模式1 根评论
-    public static final String COMMENT_MOD_ONE = "1";
+    public static final String ROOT_COMMENT = "1";
     //模式2 回复根评论
-    public static final String COMMENT_MOD_TWO = "2";
+    public static final String REPLY_COMMENT = "2";
     //模式3 回复回复
-    public static final String COMMENT_MOD_THREE = "3";
+    public static final String REPLYCOMMENT_COMMENT = "3";
 
     //文件访问路径
     public static final String FILE_PATH = "D:\\java\\idea-project\\Project-MRS\\file\\";

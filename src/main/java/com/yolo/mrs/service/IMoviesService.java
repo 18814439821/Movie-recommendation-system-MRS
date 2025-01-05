@@ -22,4 +22,6 @@ public interface IMoviesService extends IService<Movies> {
     Result movieDetail(int id);
 
     Result selectByCondition(ConditionForm conditionForm);
+
+    Result movieNameAndIdList();
 }

@@ -21,8 +21,6 @@ import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,6 +47,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     @Autowired
     private UsersMapper usersMapper;
 
+    /*登录接口*/
     @Override
     public Result login(LoginForm loginForm){
         String loginUser = loginForm.getLoginUser();
@@ -128,7 +127,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return Result.fail("用户名，手机号或密码错误");
     }
 
-
+    /*验证码接口*/
     @Override
     public Result getCode() {
         CaptchaGenerator captchaGenerator = new CaptchaGenerator();
@@ -152,6 +151,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return Result.ok(responseData);
     }
 
+    /*根据token校验用户登录状态-登录过期机制*/
     @Override
     public int check(String token) {
         String token1 = JSONUtil.toBean(token, Map.class).get("token").toString();
@@ -162,6 +162,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return 0;
     }
 
+    /*用户登出*/
     @Override
     public int logout(String token) {
         String token1 = JSONUtil.toBean(token, Map.class).get("token").toString();
@@ -173,6 +174,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return 0;
     }
 
+    /*用户名重复校验*/
     @Override
     public Result userCheck(Users user) {
         String username = user.getUsername();
@@ -195,6 +197,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return Result.fail("");
     }
 
+    /*修改用户信息*/
     @Override
     public Result updateUserInfo(UserInfoDTO user) {
         //1.判断user中是否有token
@@ -214,12 +217,13 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return Result.fail("保存失败");
     }
 
+    /*根据token获取用户信息*/
     private String getUserIdFromRedisByToken(String token) {
         Map<Object, Object> entries = stringRedisTemplate.opsForHash().entries(USER_LOGIN_KEY + token);
-        String userId = (String) entries.get("userId");
-        return userId;
+        return (String) entries.get("userId");
     }
 
+    /*获取用户头像（后续已弃用）*/
     @Override
     public Result getUserPhoto(String token) {
         //1.根据token获取userId
@@ -273,15 +277,18 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         }
     }
 
+    /*修改密码*/
     @Override
     public Result updatePwd(PwdFormDTO pwdForm) {
         String token = pwdForm.getToken();
         String userId = ""
 ;        //1.判断是否含有token
         if (StrUtil.isBlank(token) && StrUtil.isEmpty(token)){
-            //2.带有token就用token去redis查userId
-            userId = getUserIdFromRedisByToken(token);
+            //没有token则返回用户未登录，或者用户登录已过期
+            return Result.fail("用户登录已过期或未登录");
         }
+        //2.带有token就用token去redis查userId
+        userId = getUserIdFromRedisByToken(token);
         //3.根据userId查询用户密码
         String oldPwd = usersMapper.selectPwdById(userId);
         //4.判断旧密码是否一致
@@ -291,7 +298,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         }
         //4.2密码一致
         //5.修改密码
-        usersMapper.updatePdwByUserId(pwdForm.getNewPassword(),userId);
+        usersMapper.updatePwdByUserId(pwdForm.getNewPassword(),userId);
         //6.删除token
         Boolean delete = stringRedisTemplate.delete("USER_LOGIN_KEY" + token);
         if (Boolean.TRUE.equals(delete)){
@@ -300,10 +307,11 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return Result.fail("修改密码失败，请联系管理员");
     }
 
+    /*存储用户到redis-token*/
     private void user2redis(Users user, String token) {
         UsersDTO usersDTO = BeanUtil.copyProperties(user, UsersDTO.class);
         Map<String, Object> userMap = BeanUtil.beanToMap(usersDTO, new HashMap<>(),
-                //创建一个CopyOptions实例，用于配置装换选项
+                //创建一个CopyOptions实例，用于配置转换选项
                 CopyOptions.create()
                         //设置忽略null值的字段
                         .setIgnoreNullValue(true)
@@ -319,6 +327,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         stringRedisTemplate.expire(key, USER_LOGIN_TTL, TimeUnit.MINUTES);
     }
 
+    /*检查登录账号格式*/
     private static int checkFirstChar(String checkString) {
         char firstChar = checkString.charAt(0);
         if (Character.isDigit(firstChar)){

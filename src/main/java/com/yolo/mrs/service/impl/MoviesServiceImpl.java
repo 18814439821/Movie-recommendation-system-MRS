@@ -1,40 +1,29 @@
 package com.yolo.mrs.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yolo.mrs.mapper.MoviesMapper;
 import com.yolo.mrs.model.DTO.ConditionForm;
 import com.yolo.mrs.model.PO.Carousel;
 import com.yolo.mrs.model.PO.Movies;
-import com.yolo.mrs.mapper.MoviesMapper;
 import com.yolo.mrs.model.PO.MoviesDoc;
 import com.yolo.mrs.model.Result;
 import com.yolo.mrs.model.VO.MoviesVO;
 import com.yolo.mrs.service.IMoviesService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
-import org.springframework.data.elasticsearch.core.query.CriteriaQueryBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -130,6 +119,21 @@ public class MoviesServiceImpl extends ServiceImpl<MoviesMapper, Movies> impleme
         }
 
         return Result.ok(movieList, (long) movieList.size());
+    }
+
+    /*查询电影名称列表及id*/
+    @Override
+    public Result movieNameAndIdList() {
+        List<Movies> moviesList = moviesMapper.selectMovieNameAndIdList();
+        List<Map<String, String>> collect = moviesList.parallelStream().map(movies -> {
+            Integer movieId = movies.getMovieId();
+            String movieName = movies.getMovieName();
+            Map<String, String> map = new HashMap<>();
+            map.put("movieId", movieId.toString());
+            map.put("movieName", movieName);
+            return map;
+        }).collect(Collectors.toList());
+        return Result.ok(collect, (long) moviesList.size());
     }
 
 }

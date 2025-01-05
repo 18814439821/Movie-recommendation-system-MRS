@@ -3,39 +3,33 @@ package com.yolo.mrs.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yolo.mrs.mapper.CommentContentMapper;
+import com.yolo.mrs.mapper.CommentMapper;
 import com.yolo.mrs.mapper.ReplyMapper;
 import com.yolo.mrs.mapper.UsersMapper;
 import com.yolo.mrs.model.DTO.CommentDTO;
 import com.yolo.mrs.model.DTO.CommentForm;
 import com.yolo.mrs.model.DTO.ReplyDTO;
 import com.yolo.mrs.model.PO.Comment;
-import com.yolo.mrs.mapper.CommentMapper;
 import com.yolo.mrs.model.PO.CommentContent;
 import com.yolo.mrs.model.PO.Reply;
 import com.yolo.mrs.model.PO.Users;
 import com.yolo.mrs.model.Result;
 import com.yolo.mrs.model.VO.CommentVO;
 import com.yolo.mrs.model.VO.ReplyVO;
-import com.yolo.mrs.model.VO.UsersVO;
 import com.yolo.mrs.service.ICommentContentService;
 import com.yolo.mrs.service.ICommentService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yolo.mrs.service.IReplyService;
 import com.yolo.mrs.service.IUsersService;
 import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
-import static com.yolo.mrs.utils.Constant.*;
+import static com.yolo.mrs.utils.Constant.REPLYCOMMENT_COMMENT;
+import static com.yolo.mrs.utils.Constant.ROOT_COMMENT;
 
 /**
  * <p>
@@ -68,7 +62,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     public Result addComment(CommentForm commentForm) {
         System.out.println("commentForm = " + commentForm);
         //获取到commentForm之后判断评论模式
-        if (commentForm.getFlag().equals(COMMENT_MOD_ONE)){
+        if (commentForm.getFlag().equals(ROOT_COMMENT)){
             String comment_id = UUID.randomUUID().toString();
             Comment comment = new Comment();
             int i = saveComment(commentForm, comment, comment_id);
@@ -139,7 +133,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     //添加回复
     private int saveReply(CommentForm commentForm, String reply_id) {
         try {
-            //保存到回复表
+            //新建回复实体
             Reply reply = new Reply();
             //添加replyId
             reply.setReplyId(reply_id);
@@ -149,15 +143,18 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             Users userA = usersMapper.selectByUserName(commentForm.getAUserName());
             //添加回复者id
             reply.setAUserId(String.valueOf(userA.getUserId()));
-            //判断是否有被回复者，如果没有就说明是回复根评论
-            if (commentForm.getFlag().equals(COMMENT_MOD_THREE)){
-                //如果有被回复者就添加，说明是回复回复
+            //如果是回复回复
+            if (commentForm.getFlag().equals(REPLYCOMMENT_COMMENT)){
+                //查找被回复者id
                 Users userB = usersMapper.selectByUserName(commentForm.getBUserName());
                 //添加被回复者id
                 reply.setBUserId(String.valueOf(userB.getUserId()));
             }
+            //添加评论id
             reply.setContentId(reply_id);
+            //添加评论时间
             reply.setCreateTime(LocalDateTime.now());
+            //保存评论记录
             replyService.save(reply);
             //保存到评论内容表
             CommentContent commentContent = new CommentContent();
@@ -170,7 +167,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         return 1;
     }
 
-    //添加评论
+    //添加根评论
     private int saveComment(CommentForm commentForm, Comment comment, String comment_id) {
         try {
             //保存到主评论表

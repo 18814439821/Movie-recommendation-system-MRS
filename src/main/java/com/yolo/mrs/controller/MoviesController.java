@@ -1,29 +1,22 @@
 package com.yolo.mrs.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yolo.mrs.mapper.MoviesMapper;
 import com.yolo.mrs.model.DTO.ConditionForm;
-import com.yolo.mrs.model.PO.MovieMid;
-import com.yolo.mrs.model.PO.Movies;
 import com.yolo.mrs.model.PO.MoviesDoc;
 import com.yolo.mrs.model.Result;
 import com.yolo.mrs.model.VO.MoviesVO;
 import com.yolo.mrs.service.IMovieMidService;
 import com.yolo.mrs.service.IMoviesService;
-import com.yolo.mrs.utils.MovieData;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
-import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
-import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,5 +89,10 @@ public class MoviesController {
             moviesVOList.add(BeanUtil.copyProperties(content, MoviesVO.class));
         }
         return Result.ok(moviesVOList);
+    }
+
+    @GetMapping("movieNameAndIdList")
+    public Result movieNameAndIdList(){
+        return moviesService.movieNameAndIdList();
     }
 }
