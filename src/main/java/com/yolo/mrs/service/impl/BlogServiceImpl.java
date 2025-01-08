@@ -9,9 +9,12 @@ import com.yolo.mrs.mapper.BlogMapper;
 import com.yolo.mrs.model.PO.BlogContent;
 import com.yolo.mrs.model.PO.Users;
 import com.yolo.mrs.model.Result;
+import com.yolo.mrs.model.VO.BlogVO;
 import com.yolo.mrs.service.IBlogContentService;
 import com.yolo.mrs.service.IBlogService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yolo.mrs.service.IMoviesService;
+import com.yolo.mrs.service.IUsersService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +33,10 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     UsersMapper usersMapper;
     @Resource
     IBlogContentService blogContentService;
+    @Resource
+    IUsersService usersService;
+    @Resource
+    IMoviesService moviesService;
 
     @Override
     public Result saveBlog(BlogDTO blogDTO) {
@@ -57,5 +64,22 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
             return Result.fail("blog保存失败");
         }
         return Result.ok();
+    }
+
+    @Override
+    public Result getBlog(String blogId) {
+        //根据id查找blog
+        Blog blog = getById(blogId);
+        //根据userId查找作者用户名
+        Users users = usersService.getById(blog.getAuthorId());
+        //根据contentId查找blog内容
+        BlogContent contents = blogContentService.getById(blog.getBlogContentId());
+        //根据movieId查找movieName
+        BlogVO blogVO = BeanUtil.copyProperties(blog, BlogVO.class);
+        blogVO.setMovieName(moviesService.getById(blogVO.getMovieId()).getMovieName());
+        //拼凑blogVO，作为结果返回
+        blogVO.setContents(contents.getBlogContent());
+        blogVO.setUsername(users.getUsername());
+        return Result.ok(blogVO);
     }
 }

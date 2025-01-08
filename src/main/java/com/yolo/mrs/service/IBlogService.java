@@ -16,4 +16,6 @@ import com.yolo.mrs.model.Result;
 public interface IBlogService extends IService<Blog> {
 
     Result saveBlog(BlogDTO blogDTO);
+
+    Result getBlog(String blogId);
 }

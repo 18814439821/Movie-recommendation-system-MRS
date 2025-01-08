@@ -7,9 +7,7 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * <p>
- *  前端控制器
- * </p>
+ *  博客文章接口
  *
  * @author yolo
  * @since 2025-01-05
@@ -26,4 +24,10 @@ public class BlogController {
     public Result saveBlog(@RequestBody BlogDTO blogDTO){
         return blogService.saveBlog(blogDTO);
     }
+
+    @PostMapping("/getBlog")
+    public Result getBlog(@RequestParam String blogId){
+        return blogService.getBlog(blogId);
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.yolo.mrs.utils;
 
 public class Constant {
+
     public static final int INDEX_LIST_COUNT = 20;
     public static final int INDEX_LIST_NUM = 1;
 
@@ -22,10 +23,16 @@ public class Constant {
 
     //文件访问路径
     public static final String FILE_PATH = "D:\\java\\idea-project\\Project-MRS\\file\\";
+    //博客，文章图片保存路径
+    public static final String FILE_PATH_BLOG = "D:\\java\\idea-project\\Project-MRS\\file\\blogFile\\";
     //头像存储路径
     public static final String USER_PHOTO_PATH = "D:\\java\\idea-project\\Project-MRS\\photo\\";
     //默认头像路径
     public static final String USER_PHOTO_DEFAULT = "D:\\java\\idea-project\\Project-MRS\\photo\\default.png";
     //未登录头像
     public static final String USER_PHOTO_UNLOGIN = "D:\\java\\idea-project\\Project-MRS\\photo\\unlogin.png";
+    //文件访问前缀
+    public static final String NETFILE_FREFIX = "http://localhost:";
+    //文件访问后缀
+    public static final String NETFILE_SUFFIX = "file/blogFile/";
 }

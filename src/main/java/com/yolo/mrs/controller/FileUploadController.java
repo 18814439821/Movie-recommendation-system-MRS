@@ -1,16 +1,12 @@
 package com.yolo.mrs.controller;
 
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.StrUtil;
 import com.yolo.mrs.mapper.UsersMapper;
 import com.yolo.mrs.model.Result;
-import com.yolo.mrs.service.IUsersService;
-import com.yolo.mrs.service.impl.UsersServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,12 +15,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import static com.yolo.mrs.utils.Constant.FILE_PATH;
+import static com.yolo.mrs.utils.Constant.*;
 import static com.yolo.mrs.utils.RedisConstant.USER_LOGIN_KEY;
 
 
@@ -38,6 +31,8 @@ public class FileUploadController {
     StringRedisTemplate stringRedisTemplate;
     @Resource
     UsersMapper usersMapper;
+    @Value("${server.port}")
+    String port;
 
     @PostMapping("photoUpLoad")
     public Result photoUpload(@RequestParam("file") MultipartFile file, @RequestParam("token") String token, @RequestParam("photo") String photo) {
@@ -80,5 +75,25 @@ public class FileUploadController {
             return Result.fail("头像上传失败");
         }
         return Result.ok(filename);
+    }
+
+    @PostMapping("/uploadImg")
+    public Result uploadImg(@RequestParam("img") MultipartFile file){
+        //1.判断图片是否为空
+        if (file.isEmpty()) {
+            return Result.fail("上传失败，请重试");
+        }
+        String fileName = file.getOriginalFilename().replaceAll(" ","");
+        //2。创建文件对象
+        Path path = Paths.get(FILE_PATH_BLOG + fileName);
+        //3.判断是否已经上传过该图片，如果没有上传过则上传后返回地址
+        if (!Files.exists(path)) {
+            try {
+                file.transferTo(path);
+            } catch (IOException e) {
+                return Result.fail("图片保存失败，请重试");
+            }
+        }
+        return Result.ok(NETFILE_FREFIX + port + "/" + NETFILE_SUFFIX + fileName);
     }
 }
