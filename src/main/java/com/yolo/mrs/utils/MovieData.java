@@ -1,15 +1,17 @@
 package com.yolo.mrs.utils;
 
-import com.yolo.mrs.mapper.MoviesMapper;
+import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.read.listener.PageReadListener;
+import com.yolo.mrs.model.DTO.MovieDataEntity;
 import com.yolo.mrs.model.PO.MovieMid;
 import com.yolo.mrs.model.PO.Movies;
+import com.yolo.mrs.model.PO.MoviesDoc;
 import com.yolo.mrs.model.Result;
-import com.yolo.mrs.service.IMoviesService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,7 +25,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,12 +36,14 @@ public class MovieData {
     public static String AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 Edg/128.0.0.0";
 
     public static void MovieDataReady(List<Movies> moviesList, List<MovieMid> movieMidList) {
-        //请求
-        HttpClient httpClient = HttpClient.newHttpClient();
+
+
 //        //创建了一个ClassPathXmlApplicationContext对象，用于加载applicationContext.xml配置文件
 //        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
 //        //从Spring容器中获取IMoviesService接口的实现类对象。
 //        IMoviesService moviesService = context.getBean(IMoviesService.class);
+        //请求
+        HttpClient httpClient = HttpClient.newHttpClient();
         try {
             int i = 0;
             while(i < 251){
@@ -174,6 +179,12 @@ public class MovieData {
 
     //下载封面
     public static Result get(List<Movies> moviesList) {
+        EasyExcel.read("D:\\java\\idea-project\\Project-MRS\\douban-moviesInfo.xlsx", MovieDataEntity.class, new PageReadListener<MovieDataEntity>(movieDataEntities -> {
+            for (MovieDataEntity movieDataEntity : movieDataEntities) {
+                MoviesDoc moviesDoc = BeanUtil.copyProperties(movieDataEntity, MoviesDoc.class);
+
+            }
+        })).sheet("去重").doRead();
         for (Movies movies : moviesList) {
             String imageUrl = movies.getCover();
             String localPath = "D:\\java\\idea-project\\Project-MRS\\MRS\\src\\main\\resources\\pic\\";
@@ -182,7 +193,7 @@ public class MovieData {
         return Result.ok();
     }
 
-    private static void downloadPic(String imageUrl, String localPath, Integer id) {
+    public static void downloadPic(String imageUrl, String localPath, Integer id) {
         try {
             URL url = new URL(imageUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();

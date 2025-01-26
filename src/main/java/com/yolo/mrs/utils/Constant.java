@@ -35,4 +35,6 @@ public class Constant {
     public static final String NETFILE_FREFIX = "http://localhost:";
     //文件访问后缀
     public static final String NETFILE_SUFFIX = "file/blogFile/";
+    //电影封面保存路径
+    public static final String FILE_COVER_PATH = "D:\\java\\idea-project\\Project-MRS\\file\\movieCover\\";
 }

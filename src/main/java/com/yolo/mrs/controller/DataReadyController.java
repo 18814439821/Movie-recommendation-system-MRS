@@ -8,21 +8,23 @@ import com.yolo.mrs.mapper.MoviesMapper;
 import com.yolo.mrs.model.PO.Genre;
 import com.yolo.mrs.model.PO.MovieMid;
 import com.yolo.mrs.model.PO.Movies;
-import com.yolo.mrs.model.PO.MoviesDoc;
 import com.yolo.mrs.model.Result;
-import com.yolo.mrs.service.IGenreService;
+import com.yolo.mrs.service.IMovieCastsService;
 import com.yolo.mrs.service.IMovieMidService;
 import com.yolo.mrs.service.IMoviesService;
 import com.yolo.mrs.utils.MovieData;
+import com.yolo.mrs.utils.doubanData;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.yolo.mrs.utils.RedisConstant.GENRE_TYPE;
 
@@ -46,6 +48,8 @@ public class DataReadyController{
     ElasticsearchTemplate elasticsearchTemplate;
     @Resource
     private MovieMidMapper movieMidMapper;
+    @Resource
+    IMovieCastsService movieCastsService;
 
     /*爬取电影数据*/
     @PostMapping("movieData")
@@ -109,21 +113,24 @@ public class DataReadyController{
         return Result.ok();
     }
 
+    /*movies数据存储到数据库*/
+    @PostMapping("moviesDataFromFileToDatabase")
+    public Result moviesDatFromFileToDatabase(){
+        doubanData.readExcelToDatabase(moviesService, movieCastsService);
+        return Result.ok();
+    }
+
+    /*补加movies表中的district跟genre*/
+    @PostMapping("moviesDataFix")
+    public Result moviesDataFix(){
+        doubanData.readDatabaseToFix(moviesMapper, moviesService);
+        return Result.ok();
+    }
+
     /*movies数据存储到es*/
-    @PostMapping("moviesToEs")
-    public Result moviesToEs(){
-        //查询数据库中movies表
-        List<Movies> moviesList = moviesService.list();
-        //处理成moviesDoc
-        List<MoviesDoc> moviesDocList = moviesList.stream().map(movies -> BeanUtil.copyProperties(movies, MoviesDoc.class)).toList();
-        //遍历列表，分别新增到es中
-        for (MoviesDoc moviesDoc : moviesDocList) {
-            //从中间表查询类别并添加进去
-            MovieMid movieMid = movieMidMapper.selectByMovieName(moviesDoc.getMovieName());
-            moviesDoc.setGenre(movieMid.getGenre());
-            MoviesDoc save = elasticsearchTemplate.save(moviesDoc);
-            System.out.println("save = " + save);
-        }
+    @PostMapping("moviesDataToES")
+    public Result moviesDataToES(){
+        doubanData.readExcelToES(elasticsearchTemplate, moviesMapper);
         return Result.ok();
     }
 }

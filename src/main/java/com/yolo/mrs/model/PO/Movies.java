@@ -1,15 +1,11 @@
 package com.yolo.mrs.model.PO;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.Date;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -26,7 +22,7 @@ public class Movies implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "主键")
-    @TableId(value = "movie_id", type = IdType.AUTO)
+    @TableId("movie_id")
     private Integer movieId;
 
     @Schema(description = "电影名称")
@@ -46,4 +42,10 @@ public class Movies implements Serializable {
 
     @Schema(description = "是否轮播")
     private Integer carousel;
+
+    @Schema(description = "电影所属地区")
+    private String district;
+
+    @Schema(description = "电影类型")
+    private String genre;
 }

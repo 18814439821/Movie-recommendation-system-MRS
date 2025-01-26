@@ -28,4 +28,7 @@ public interface MoviesMapper extends BaseMapper<Movies> {
 
     @Select("select movies.movie_name,movies.movie_id from movies")
     List<Movies> selectMovieNameAndIdList();
+
+    @Select("select * from movies where movie_name = #{movieName} and stars = #{stars}")
+    Movies selectIdByMovieNameAndStars(String movieName, String stars);
 }
